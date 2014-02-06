@@ -10,6 +10,10 @@
 	.tb_list tbody{
 	    cursor: pointer;
 	}
+	#tb_merge td{
+		border: 1px;
+		border-style: solid;
+	}
 	</style>
 	<script type="text/javascript" src="../jquery-1.11.0.min.js"></script>
 	<script type="text/javascript" src="../wsm.js"></script>
@@ -52,7 +56,14 @@
 		//토글 버튼 
 		wsm.form.applyChkToggle();
 
-		        
+		//입력길이 테스트
+		$("#txt_len").keyup(function(){
+			var len = wsm.common.getByteLen( $(this).val() );
+			$("#disp_len").html( wsm._.sprintf("입력 길이 : %d", len) );
+		});
+
+		//테이블병합
+		wsm.form.mergeTable({td_cnt:2});
 	});
 
 	</script>
@@ -61,30 +72,53 @@
     jquery 를 사용해야 됩니다. ( 1.x 또는 2.x 최신 버전을 사용하는 것을 권장합니다.)    
 -->
 <body>
-<form id="myForm" name="myForm" method="post">
-    <p>WSM TEST</p>
-    
-    <!-- 페이징 처리 -->
-    <div id="pager"></div>
-    
-    <!-- 그래프 그리는 곳 -->
-    <div id="graph"></div>
-    
-    <!-- 테이블 영역 표현 -->
-    <table class="tb_list">
-		<colgroup>
-			<col width="20"></col>
-			<col width=""></col>
-		</colgroup>
-		<thead>
-			<tr><td id="btn_toggle">V</td><td>TITLE</td></tr>
-		</thead>
-		<tbody>
-            <tr><td><input type="checkbox" class="chk_inp"/></td><td>1번 항목 </td></tr>
-            <tr><td><input type="checkbox" class="chk_inp"/></td><td>2번 항목 </td></tr>
-            <tr><td><input type="checkbox" class="chk_inp"/></td><td>3번 항목 </td></tr>
-		</tbody>
-	</table>
-</form>
+	<form id="myForm" name="myForm" method="post">
+		<p>WSM TEST</p>
+
+		<!-- 페이징 처리 -->
+		<div id="pager"></div>
+
+		<!-- 그래프 그리는 곳 -->
+		<div id="graph"></div>
+
+		<!-- 테이블 영역 표현 -->
+		<table class="tb_list">
+			<colgroup>
+				<col width="20"></col>
+				<col width=""></col>
+			</colgroup>
+			<thead>
+				<tr><td id="btn_toggle">V</td><td>TITLE</td></tr>
+			</thead>
+			<tbody>
+				<tr><td><input type="checkbox" class="chk_inp"/></td><td>1번 항목 </td></tr>
+				<tr><td><input type="checkbox" class="chk_inp"/></td><td>2번 항목 </td></tr>
+				<tr><td><input type="checkbox" class="chk_inp"/></td><td>3번 항목 </td></tr>
+			</tbody>
+		</table>
+
+		<!-- 입력길이 연산 -->
+		<textarea id="txt_len"></textarea><span id="disp_len"></span>
+
+		<!-- 테이블 병합 -->
+		<table id="tb_merge">
+			<colgroup>
+			</colgroup>
+			<thead>
+				<tr><th>대분류</th><th>중분류</th><th>소분류</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>111</td><td>aaa</td><td>a</td></tr>
+				<tr><td>111</td><td>bbb</td><td>b</td></tr>
+				<tr><td>111</td><td>bbb</td><td>c</td></tr>
+				<tr><td>222</td><td>ccc</td><td>d</td></tr>
+				<tr><td>222</td><td>ccc</td><td>e</td></tr>
+				<tr><td>333</td><td>ddd</td><td>e</td></tr>
+				<tr><td>333</td><td>ddd</td><td>f</td></tr>
+				<tr><td>333</td><td>eee</td><td>f</td></tr>
+				<tr><td>333</td><td>eee</td><td>g</td></tr>
+			</tbody>
+		</table>
+	</form>
 </body>
 </html>

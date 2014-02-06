@@ -932,6 +932,59 @@
 		/* 버전 */
 		VERSION : "1.0",
 
+		/* 테이블 병합 기본설정  */
+		DEF_SET_MERGE : { 
+			tid : "tb_merge",		//병합할 테이블의 아이디
+			td_cnt : 3,		//병합할 TD개수, 앞에서 부터 병합을 수행한다. 가운데부터 시작 안됨.
+		},
+
+		mergeTable : function( settings )
+		{
+			//설정에서 값이 없으면 기본값을 상속받도록 한다.
+  			settings = $.extend({},  this.DEF_SET_MERGE , settings || {} );
+
+  			var tid = settings.tid, td_cnt = settings.td_cnt;
+
+  			//CHECK : 조회 결과가 2라인 이상일 경우 병합을 수행한다
+			if($("#"+tid+"  tr").length<=1)
+			{
+				console.log("return");
+				return;
+			}
+
+			//ROWSPAN 및 제거 필드 설정
+			for(var i=0;i<td_cnt;i++)
+			{
+				var $td_prev = null;
+				var text_prev = null;
+				var rowCnt = 1;
+				$("#"+tid+" tr").each(function(idx, item)
+				{
+					var $td_now = $(this).find(":eq("+i+")");
+					var text_now = $td_now.html();
+
+					if(text_prev==text_now){
+						rowCnt++;
+						$td_prev.attr("rowspan", rowCnt);
+						$td_now.addClass("td_remove");
+					}else{
+						$td_prev=null;
+					}
+
+					if($td_prev == null){
+						$td_prev = $td_now;
+						rowCnt = 1;
+					}
+					text_prev = text_now;
+				});
+			}
+
+			//동일한 TD제거 처리
+			$(".td_remove").each(function(){
+				$(this).remove();
+			});
+		},
+
 		
 		/* 체크 기본설정  */
 		DEF_SET_CHECK : { 
@@ -1691,8 +1744,41 @@
 		/* 버전 */
 		VERSION : "1.0",
 
-		/* toNumbwe 기본값 */
-		DEF_TO_NUMBER : 0,
+		/* getByteLen 기본값 */
+		DEF_BYTE_LEN : 2,
+
+		/**
+		* 입력 문자열의 길이를 반환한다.
+		* escape하여 특수문자(한글포함)의 길이를 치환하여 계산한다
+		* @param  inStr 입력 문자열
+		* @param inDef 특수문자(한글)의 기본길이(미지정 시 DEF_BYTE_LEN)
+		* @since 2014.02.06
+		**/
+		getByteLen : function ( inStr, inDef ){
+			var _EXT_LEN = inDef==null?this.DEF_BYTE_LEN:inDef; //UTF-8은 3을 DB에서 차지함 / 각각의 DB에 따라 다름
+
+			var res = 0;
+
+			//check null
+			if(inStr==null){
+				return res;
+			}
+
+			for(var i=0; i<inStr.length; i++)
+			{
+				var c = inStr.charAt(i);
+				if(escape(c).length>4)	//특수문자(한글)는 escape 시 4를 초과
+				{
+					res+=_EXT_LEN;
+				}
+				else
+				{
+					res++;
+				}
+			}
+
+			return res;
+		},
 
 		/**
 		* KEY, VALUE 형태로 구성된 OBJECT를 URL PRAMETER에 맞춰 직렬화 해준다.
@@ -1717,6 +1803,9 @@
 		getType : function ( obj ) {
 		  return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
 		},
+
+		/* toNumbwe 기본값 */
+		DEF_TO_NUMBER : 0,
 
 		/**
 		* 컴마 제거 이후 문자열을 숫자로 변환
