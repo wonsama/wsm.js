@@ -1,0 +1,90 @@
+<html>
+<head>
+	<style type="text/css">
+	p{
+	    color : blue;
+	}
+	.tb_list tbody tr.odd{background: #ffffff }
+	.tb_list tbody tr.even{background: #b9e8c5}
+	.tb_list tbody tr.sel{background-color: #66cc00;}
+	.tb_list tbody{
+	    cursor: pointer;
+	}
+	</style>
+	<script type="text/javascript" src="../jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="../wsm.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		//로딩 화면을 표현
+		wsm.form.loadingShow(
+		    {
+		        msg : "잠시만 기다려 주세요",
+		        image : "http://wonsama.com/share/loading.gif"
+		    }
+		);
+
+		//로딩 화면 감추기
+		wsm.form.loadingHide();
+
+		//페이징 처리
+		wsm.pager.add();
+
+		//바(스택) 그래프
+		var data = {
+		    items:[ 
+		        {value : 10 },
+		        {value : 9 },
+		        {value : 8 },
+		        {value : 7 },
+		        {value : 6 },
+		        {value : 5 },
+		        {value : 4 },
+		        {value : 3 },
+		        {value : 2 },
+		        {value : 1 },
+		    ]
+		};
+		wsm.graph.drawBar( data );
+
+		//2컬러 테이블
+		wsm.style.apply2ColorTable();
+
+		//토글 버튼 
+		wsm.form.applyChkToggle();
+
+		        
+	});
+
+	</script>
+</head>
+<!--
+    jquery 를 사용해야 됩니다. ( 1.x 또는 2.x 최신 버전을 사용하는 것을 권장합니다.)    
+-->
+<body>
+<form id="myForm" name="myForm" method="post">
+    <p>WSM TEST</p>
+    
+    <!-- 페이징 처리 -->
+    <div id="pager"></div>
+    
+    <!-- 그래프 그리는 곳 -->
+    <div id="graph"></div>
+    
+    <!-- 테이블 영역 표현 -->
+    <table class="tb_list">
+		<colgroup>
+			<col width="20"></col>
+			<col width=""></col>
+		</colgroup>
+		<thead>
+			<tr><td id="btn_toggle">V</td><td>TITLE</td></tr>
+		</thead>
+		<tbody>
+            <tr><td><input type="checkbox" class="chk_inp"/></td><td>1번 항목 </td></tr>
+            <tr><td><input type="checkbox" class="chk_inp"/></td><td>2번 항목 </td></tr>
+            <tr><td><input type="checkbox" class="chk_inp"/></td><td>3번 항목 </td></tr>
+		</tbody>
+	</table>
+</form>
+</body>
+</html>
