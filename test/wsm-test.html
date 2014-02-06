@@ -61,9 +61,16 @@
 			var len = wsm.common.getByteLen( $(this).val() );
 			$("#disp_len").html( wsm._.sprintf("입력 길이 : %d", len) );
 		});
+		$("#txt_len").trigger('keyup');
 
 		//테이블병합
 		wsm.form.mergeTable({td_cnt:2});
+
+		//시간
+		wsm.common.repeat(1000).on(function(){
+			var t = wsm.common.getTime();
+			$("#disp_timer").html( t.YYYYMMDD + " " + t.hhmmss );
+		});
 	});
 
 	</script>
@@ -119,6 +126,9 @@
 				<tr><td>333</td><td>eee</td><td>g</td></tr>
 			</tbody>
 		</table>
+
+		<!-- 시간 -->
+		<div id="disp_timer"></div>
 	</form>
 </body>
 </html>

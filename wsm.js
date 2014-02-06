@@ -1744,9 +1744,67 @@
 		/* 버전 */
 		VERSION : "1.0",
 
+		/**
+		* 대기 이후 함수를 수행한다
+		* notifier :: .on(수행할 함수) / .off() 취소
+		* @param inTime 대기 시간
+		* @since 2014.02.06
+		**/
+		/*
+			ex) 
+			wsm.common.wait(1000).on( function(){ console.log("occured") } );
+		*/
+		wait : function( inTime ){
+			var deferred = $.Deferred(),
+				promise = deferred.promise(),
+				timeoutId = setTimeout(deferred.resolve, inTime);
+
+			promise.on = promise.done;
+			promise.off = function(){ 
+				clearTimeout(timeoutId); 
+				deferred.reject.apply(deferred, arguments);
+			};
+
+			return promise;
+		},
+
+		/**
+		* 함수를 반복 수행한다 ( inCnt 미 지정 또는 음수는 무한반복 )
+		* notifier :: .on(수행할 함수) / .off() 취소
+		* @param inTime 대기 시간
+		* @param inCnt 반복 횟수
+		* @since 2014.02.06
+		**/
+		/*
+			ex) 
+			wsm.common.repeat(1000).on( function(){ console.log("occured") } );
+		*/
+		repeat : function( inTime, inCnt ){
+			var deferred = $.Deferred(), 
+				promise = deferred.promise(),
+				useCnt = inCnt!=null && !isNaN(inCnt) && Number(inCnt)>0?true:false,
+				timeoutId = setInterval(function(){
+					if(useCnt && promise.inCnt==Number(inCnt) ){
+						promise.off();
+					}else if(useCnt){
+						promise.inCnt++;	
+					}
+					deferred.notify();
+				}, inTime);
+				
+			promise.inCnt = 0;
+			promise.on = promise.progress;
+			promise.off = function(){
+				clearInterval(timeoutId);
+				deferred.reject.apply(deferred, arguments);
+			};
+
+			return promise;
+		},
+
 		/* getByteLen 기본값 */
 		DEF_BYTE_LEN : 2,
-
+		
 		/**
 		* 입력 문자열의 길이를 반환한다.
 		* escape하여 특수문자(한글포함)의 길이를 치환하여 계산한다
@@ -1930,6 +1988,32 @@
 			d.setFullYear(yyyy,mm-1,dd);
 
 			return d.getTime() / ONE_DAY;
+		},
+
+		/**
+		* 현재 시간을 반환한다 : 외부 라이브러리로는 Moment.js 가 좋음
+		* @return 현재 시간 오브젝트를 반환한다
+		* @since 2014.02.06
+		**/
+		getTime : function(){
+			var d = new Date(),
+				YYYY = d.getFullYear(),
+				YY = YYYY%100,
+				MM = d.getMonth()+1,
+				DD = d.getDate(),
+				HH = d.getHours(), /*24h*/
+				hh = HH%12,	/*12h*/
+				mm = d.getMinutes(),
+				ss = d.getSeconds(),
+				mil = d.getMilliseconds();
+			return {
+				YYYY:YYYY, YY:YY,
+				HH:HH, hh:hh, mm:mm, ss:ss, mil:mil,
+				hhmmss:wsm._.sprintf("%s:%s:%s", wsm._.lpad(hh,2,'0') ,wsm._.lpad(mm,2,'0'),wsm._.lpad(ss,2,'0')),
+				HHmmss:wsm._.sprintf("%s:%s:%s", wsm._.lpad(HH,2,'0') ,wsm._.lpad(mm,2,'0'),wsm._.lpad(ss,2,'0')),
+				YYMMDD:wsm._.sprintf("%s-%s-%s", wsm._.lpad(YY,2,'0'),wsm._.lpad(MM,2,'0'),wsm._.lpad(DD,2,'0')),
+				YYYYMMDD:wsm._.sprintf("%s-%s-%s", wsm._.lpad(YYYY,2,'0'),wsm._.lpad(MM,2,'0'),wsm._.lpad(DD,2,'0')),
+			};
 		},
 	};
 
